@@ -29,7 +29,11 @@ public class shotodol.LuaExtension : Extension {
 	public override int desc(OutputStream pad) {
 		base.desc(pad);
 		extring dlg = extring.stack(128);
- 		dlg.printf("Lua source:%s\nTarget function:%s\n", scriptName.to_string(), targetFunction.to_string());
+		dlg.concat_string("Lua source:");
+		dlg.concat(&scriptName);
+		dlg.concat_string("\nTarget function:");
+		dlg.concat(&targetFunction);
+		dlg.concat_char('\n');
 		pad.write(&dlg);
 		return 0;
 	}
