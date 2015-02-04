@@ -15,9 +15,9 @@ static void* lua_impl_memcb(void *ud, void *ptr, size_t osize,size_t nsize) {
 		return realloc(ptr, nsize);
 }
 
-static aroop_cl_shotodol_shotodol_output_stream*lua_impl_get_ostrm_as(lua_State*script) {
+static aroop_cl_shotodol_output_stream*lua_impl_get_ostrm_as(lua_State*script) {
 	lua_getglobal(script, ostrmvar);
-	aroop_cl_shotodol_shotodol_output_stream*ostrm = (void*)lua_touserdata(script, -1);
+	aroop_cl_shotodol_output_stream*ostrm = (void*)lua_touserdata(script, -1);
 	lua_pop(script, 1);
 	return ostrm;
 }
@@ -26,9 +26,9 @@ static int lua_impl_shotodol_write(lua_State*script) {
 	aroop_txt_t x;
 	aroop_memclean_raw2(&x);
 	lua_impl_get_xtring_as(script, &x, -1);
-	aroop_cl_shotodol_shotodol_output_stream*ostrm = lua_impl_get_ostrm_as(script);
+	aroop_cl_shotodol_output_stream*ostrm = lua_impl_get_ostrm_as(script);
 	void*err;
-	aroop_cl_shotodol_shotodol_output_stream_write(ostrm, &x, err);
+	shotodol_output_stream_write(ostrm, &x, err);
 	return 0;
 }
 

@@ -4,6 +4,7 @@ Roadmap
 #### Framework
 - [x] Keep shotodol bare minimum. Move extra modules in other projects.
 	- [x] Move lua scripting into separate shotodol_script package.
+- [ ] Make it possible to get/set Replicable from the script. One possible way to do that is to write functions like x.set(fieldName,value), or x.get(fieldName,value) .
 
 #### Language support
 - [ ] Integrate python.
