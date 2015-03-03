@@ -18,6 +18,7 @@ internal class ScriptCommand : M100Command {
 	}
 	CompositeExtension ex;
 	unowned Module sourceModule;
+	unowned LuaStack? script;
 	public ScriptCommand(CompositeExtension container, Module mod) {
 		extring prefix = extring.set_static_string("script");
 		base(&prefix);
@@ -28,8 +29,8 @@ internal class ScriptCommand : M100Command {
 		sourceModule = mod;
 	}
 
-	unowned LuaStack? script;
 	public override int act_on(extring*cmdstr, OutputStream pad, M100CommandSet cmds) throws M100CommandError.ActionFailed {
+		bool loading = false;
 		ArrayList<xtring> vals = ArrayList<xtring>();
 		if(parseOptions(cmdstr, &vals) != 0) {
 			throw new M100CommandError.ActionFailed.INVALID_ARGUMENT("Invalid argument");
@@ -41,6 +42,7 @@ internal class ScriptCommand : M100Command {
 		}
 		
 		if(fn != null) {
+			loading = true;
 			script = LuaStack.create();
 			if(script.loadFile(fn.fly().to_string()) != 0) {
 				extring dlg = extring.set_static_string("Failed to load file\n");
@@ -54,7 +56,10 @@ internal class ScriptCommand : M100Command {
 		if(script == null)
 			return 0;
 		if(tgt == null) {
-			tgt = new xtring.set_static_string("rehash");
+			if(loading)
+				tgt = new xtring.set_static_string("onLoad");
+			else
+				tgt = new xtring.set_static_string("rehash");
 		}
 		script.setOutputStream(pad);
 		extring dlg = extring.stack(128);
@@ -65,15 +70,18 @@ internal class ScriptCommand : M100Command {
 		if(script.isString(-1)) {
 			extring scriptout = extring();
 			script.getXtringAs(&scriptout, -1);
-			pad.write(&scriptout);
-			if(tgt.fly().equals_static_string("rehash")) {
+			if(tgt.fly().equals_static_string("rehash") || tgt.fly().equals_static_string("onLoad")) {
 				registerHookExtensions(fn, &scriptout);
+			} else {
+				pad.write(&scriptout);
 			}
 		}
 		script.pop(1);
 		return 0;
 	}
 	void registerHookExtensions(extring*fn, extring*funcs) {
+		BufferedOutputStream outs = new BufferedOutputStream(1024);
+		ex.unregisterModule(sourceModule, outs);
 		extring token = extring();
 		extring inp = extring.stack_copy_deep(funcs);
 		while(true) {
@@ -82,7 +90,7 @@ internal class ScriptCommand : M100Command {
 				break;
 			}
 			print("registering %s hook\n", token.to_string());
-			ex.register(&token, new LuaExtension(script, fn, &token, sourceModule));
+			ex.register(&token, new LuaExtension(script, fn, &token, sourceModule), true);
 		}
 	}
 }
