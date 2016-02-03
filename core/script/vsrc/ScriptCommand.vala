@@ -85,7 +85,7 @@ internal class ScriptCommand : M100Command {
 		extring token = extring();
 		extring inp = extring.stack_copy_deep(funcs);
 		while(true) {
-			LineAlign.next_token(&inp, &token);
+			LineExpression.next_token(&inp, &token);
 			if(token.is_empty_magical()) {
 				break;
 			}

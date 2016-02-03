@@ -27,6 +27,7 @@ static int lua_impl_shotodol_write(lua_State*script) {
 	aroop_memclean_raw2(&x);
 	lua_impl_get_xtring_as(script, &x, -1);
 	aroop_cl_shotodol_output_stream*ostrm = lua_impl_get_ostrm_as(script);
+	aroop_assert(ostrm != NULL);
 	void*err;
 	shotodol_output_stream_write(ostrm, &x, err);
 	return 0;
